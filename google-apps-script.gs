@@ -19,7 +19,7 @@ function doPost(e) {
     // Create headers if they don't exist
     const firstRow = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
     if (!firstRow || firstRow.every(cell => cell === "")) {
-      const headers = ["Timestamp", "Name", "Email", "Phone", "University", "Position", "IEEE Status", "Resume URL"];
+      const headers = ["Timestamp", "Name", "Email", "Phone", "University", "Position", "IEEE Status", "IEEE Membership ID", "Resume URL"];
       sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     }
     
@@ -33,6 +33,7 @@ function doPost(e) {
       data.university || "",
       data.position || "",
       data.ieeeStatus || "",
+      data.ieeeMembershipId || "",
       data.resumeUrl || ""
     ];
     
@@ -64,6 +65,7 @@ function testPost() {
       university: "Test University",
       position: "Test Position",
       ieeeStatus: "Student Member",
+      ieeeMembershipId: "12345678",
       resumeUrl: "https://example.com/resume.pdf"
     }
   };

@@ -134,7 +134,8 @@ const schedule: DaySchedule[] = [
         role: "AI and 5G/6G System Engineering Expert",
         company: "Apple, Intel, Huawei",
         country: "🇪🇬 Egypt",
-        linkedinUrl: "https://de.linkedin.com/in/marwa-el-hefnawy-ph-d-43407639",
+        linkedinUrl: "https://www.linkedin.com/in/marwa-el-hefnawy-ph-d-06267373/",
+        imageUrl: "/images/speakers/marwa-el-hefnawy.jpg",
       },
       {
         name: "Omar Samir",
@@ -142,6 +143,7 @@ const schedule: DaySchedule[] = [
         company: "EY",
         country: "🇪🇬 Egypt",
         linkedinUrl: "https://eg.linkedin.com/in/omar-samir-8415b2285",
+        imageUrl: "/images/speakers/omar-samir.jpg",
       },
       {
         name: "Ayman Saber",
@@ -167,6 +169,7 @@ const schedule: DaySchedule[] = [
         company: "Keheilan",
         country: "🇪🇬 Egypt",
         linkedinUrl: "https://eg.linkedin.com/in/amany-h-b-eissa-a9108b52",
+        imageUrl: "/images/speakers/amani-eissa.jpg",
       },
       {
         name: "Ahmed Abdelhamid",
@@ -174,6 +177,7 @@ const schedule: DaySchedule[] = [
         company: "Keheilan",
         country: "🇪🇬 Egypt",
         linkedinUrl: "https://be.linkedin.com/in/ahmedabdelhamid",
+        imageUrl: "/images/speakers/ahmed-abdelhamid.jpg",
       },
     ],
     isPanel: true,
@@ -222,9 +226,9 @@ function FloatingDecoration({ src, className, duration = 6, delay = 0 }: { src: 
 /* ───── Speaker avatar with golden frame ───── */
 function SpeakerAvatar({ speaker, size = "md" }: { speaker: Speaker; size?: "sm" | "md" | "lg" }) {
   const sizeClasses = {
-    sm: "w-14 h-14",
-    md: "w-20 h-20",
-    lg: "w-28 h-28",
+    sm: "w-20 h-20",
+    md: "w-28 h-28",
+    lg: "w-36 h-36",
   };
   const initials = speaker.name
     .split(" ")
@@ -246,7 +250,7 @@ function SpeakerAvatar({ speaker, size = "md" }: { speaker: Speaker; size?: "sm"
         />
       ) : null}
       <div
-        className={`${speaker.imageUrl ? "hidden" : ""} w-full h-full bg-gradient-to-br from-[#B58D53] to-[#96542E] flex items-center justify-center text-white font-bold ${size === "lg" ? "text-xl" : size === "md" ? "text-base" : "text-sm"}`}
+        className={`${speaker.imageUrl ? "hidden" : ""} w-full h-full bg-gradient-to-br from-[#B58D53] to-[#96542E] flex items-center justify-center text-white font-bold ${size === "lg" ? "text-3xl" : size === "md" ? "text-xl" : "text-base"}`}
       >
         {initials}
       </div>
@@ -301,42 +305,73 @@ export default function Home() {
     university: "",
     position: "",
     ieeeStatus: "",
+    ieeeMembershipId: "",
     resumeUrl: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const handleFormChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    // Clear error when user starts typing
+    if (formErrors[field]) {
+      setFormErrors((prev) => ({ ...prev, [field]: "" }));
+    }
+  };
+
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    if (!formData.name.trim()) errors.name = "Full name is required";
+    if (!formData.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = "Please enter a valid email address";
+    }
+    if (!formData.phone.trim()) {
+      errors.phone = "Phone number is required";
+    } else if (!/^[+]?[\d\s-()]{7,20}$/.test(formData.phone.replace(/\s/g, ""))) {
+      errors.phone = "Please enter a valid phone number";
+    }
+    if (!formData.university.trim()) errors.university = "University/Organization is required";
+    if (!formData.position.trim()) errors.position = "Current position is required";
+    if (formData.ieeeStatus && formData.ieeeStatus !== "not-member" && !formData.ieeeMembershipId.trim()) {
+      errors.ieeeMembershipId = "Please enter your IEEE membership ID";
+    }
+    if (formData.resumeUrl && !/^https?:\/\/.+/.test(formData.resumeUrl)) {
+      errors.resumeUrl = "Please enter a valid URL starting with http:// or https://";
+    }
+    return errors;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.email || !formData.phone || !formData.university || !formData.position) {
-      toast.error("Please fill in all required fields");
+    const errors = validateForm();
+    setFormErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      toast.error("Please fix the highlighted errors");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
+      const formBody = new FormData();
+      formBody.append("name", formData.name);
+      formBody.append("email", formData.email);
+      formBody.append("phone", formData.phone);
+      formBody.append("university", formData.university);
+      formBody.append("position", formData.position);
+      formBody.append("ieeeStatus", formData.ieeeStatus || "N/A");
+      formBody.append("ieeeMembershipId", formData.ieeeMembershipId || "N/A");
+      formBody.append("resumeUrl", formData.resumeUrl || "N/A");
+
       await fetch(
         "https://script.google.com/macros/s/AKfycbxAF7Tb8VRJmrII_8OzdBmv3a49Ver8x5YKvUBmYlq2A5tw5z9QJFnXsK_Z4B3Olec/exec",
         {
           method: "POST",
           mode: "no-cors",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams({
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            university: formData.university,
-            position: formData.position,
-            ieeeStatus: formData.ieeeStatus || "N/A",
-            resumeUrl: formData.resumeUrl || "N/A",
-          }).toString(),
+          body: formBody,
         }
       );
 
@@ -348,8 +383,10 @@ export default function Home() {
         university: "",
         position: "",
         ieeeStatus: "",
+        ieeeMembershipId: "",
         resumeUrl: "",
       });
+      setFormErrors({});
     } catch (error) {
       toast.error("Failed to submit registration. Please try again.");
       console.error("Form submission error:", error);
@@ -367,7 +404,7 @@ export default function Home() {
             <img
               src="/images/brand/qataiyef-logo.jpeg"
               alt="QatAIyef Logo"
-              className="h-11 w-11 rounded-lg ring-2 ring-[#B58D53]/50 object-cover"
+              className="h-11 w-11 rounded-full ring-2 ring-[#B58D53]/50 object-cover"
             />
             <div>
               <h1 className="text-xl font-bold text-[#FDF0C4] tracking-wide">QatAIyef</h1>
@@ -488,9 +525,9 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <img
-              src="/images/brand/qataiyef-logo.jpeg"
+              src="/images/brand/qataiyef-logo-circle.png"
               alt="QatAIyef Logo"
-              className="w-32 h-32 md:w-40 md:h-40 mx-auto mb-6 rounded-2xl ring-4 ring-[#B58D53]/60 shadow-2xl shadow-[#B58D53]/20"
+              className="w-48 h-48 md:w-40 md:h-40 mx-auto mb-6 rounded-full ring-4 ring-[#B58D53]/60 shadow-2xl shadow-[#B58D53]/20"
             />
           </motion.div>
 
@@ -533,7 +570,7 @@ export default function Home() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.7 }}
           >
-            A distinguished 7-day online technical event by IEEE EUI Computer Society, 
+            A distinguished 7-day online technical event by IEEE EUI Computer Society,
             guiding you through secure GenAI development, production deployment, and career pathways in AI engineering.
           </motion.p>
 
@@ -569,7 +606,7 @@ export default function Home() {
           >
             <span className="text-xs text-[#FDF0C4]/50 uppercase tracking-wider">Organized by</span>
             <img src="/images/brand/ieee-logo.jpg" alt="IEEE EUI" className="h-10 object-contain rounded" />
-            <img src="/images/brand/ieee-eui-cs.jpeg" alt="IEEE EUI CS" className="h-10 object-contain rounded" />
+            <img src="/images/brand/ieee-cs-eui.png" alt="IEEE EUI CS" className="h-10 object-contain rounded" />
           </motion.div>
         </div>
 
@@ -656,69 +693,117 @@ export default function Home() {
             </div>
           </AnimatedSection>
 
-          <div className="space-y-6 max-w-5xl mx-auto">
+          <div className="space-y-8 max-w-5xl mx-auto">
             {schedule.map((daySchedule, index) => (
               <AnimatedSection key={index} delay={index * 0.08}>
-                <div className="group relative bg-gradient-to-r from-[#3D2317] to-[#3D2317]/80 rounded-xl overflow-hidden border border-[#B58D53]/15 hover:border-[#B58D53]/40 transition-all duration-500 hover:shadow-xl hover:shadow-[#B58D53]/10">
-                  {/* Gold accent bar */}
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#B58D53] to-[#96542E]" />
-                  
-                  <div className="p-6 md:p-8">
-                    <div className="flex flex-col md:flex-row gap-6">
-                      {/* Speaker photo(s) - LEFT side */}
-                      <div className="flex md:flex-col items-center gap-3 md:min-w-[100px]">
-                        {daySchedule.speakers.map((speaker, si) => (
-                          <SpeakerAvatar key={si} speaker={speaker} size={daySchedule.isPanel ? "sm" : "lg"} />
-                        ))}
+                {daySchedule.isPanel ? (
+                  /* ──── PANEL DISCUSSION CARD ──── */
+                  <div className="group relative rounded-2xl overflow-hidden border-2 border-[#B58D53]/30 hover:border-[#B58D53]/60 transition-all duration-500 hover:shadow-2xl hover:shadow-[#B58D53]/15" style={{ background: "linear-gradient(135deg, #3D2317 0%, #2A0F0F 50%, #631616/40 100%)" }}>
+                    {/* Top gold accent bar */}
+                    <div className="h-1.5 bg-gradient-to-r from-[#B58D53] via-[#FDF0C4] to-[#B58D53]" />
+
+                    <div className="p-8">
+                      {/* Panel header */}
+                      <div className="flex flex-wrap items-center gap-3 mb-4">
+                        <span className="inline-flex items-center gap-2 bg-gradient-to-r from-[#B58D53] to-[#96542E] text-[#3D2317] px-5 py-2 rounded-full font-bold text-sm uppercase tracking-wider shadow-lg">
+                          <img src="/images/decorations/moon.png" alt="" className="w-4 h-4" />
+                          Night {daySchedule.day}
+                        </span>
+                        <span className="text-[#B58D53]/80 text-sm">{daySchedule.date}</span>
+                        <span className="inline-flex items-center gap-1.5 bg-[#FDF0C4]/10 border border-[#B58D53]/40 text-[#FDF0C4] px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
+                          <Users className="w-3.5 h-3.5" />
+                          Panel Discussion
+                        </span>
                       </div>
 
-                      {/* Content - RIGHT side */}
-                      <div className="flex-1">
-                        <div className="flex flex-wrap items-center gap-3 mb-3">
-                          <span className="inline-flex items-center gap-1.5 bg-[#B58D53] text-[#3D2317] px-4 py-1.5 rounded-full font-bold text-xs uppercase tracking-wider">
-                            <img src="/images/decorations/moon.png" alt="" className="w-3.5 h-3.5" />
-                            Night {daySchedule.day}
-                          </span>
-                          <span className="text-[#B58D53]/80 text-sm">{daySchedule.date}</span>
-                          {daySchedule.isPanel && (
-                            <span className="inline-block bg-[#631616] border border-[#B58D53]/30 text-[#B58D53] px-3 py-1 rounded-full text-xs font-bold uppercase">
-                              Panel
-                            </span>
-                          )}
+                      <h3 className="text-2xl md:text-3xl font-bold text-[#FDF0C4] mb-3 group-hover:text-[#B58D53] transition-colors">
+                        {daySchedule.title}
+                      </h3>
+                      <p className="text-[#FDF0C4]/60 text-sm mb-8 leading-relaxed max-w-3xl">{daySchedule.description}</p>
+
+                      {/* Panel speakers grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {daySchedule.speakers.map((speaker, si) => (
+                          <a
+                            key={si}
+                            href={speaker.linkedinUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-4 p-4 bg-[#2A0F0F]/60 rounded-xl border border-[#B58D53]/10 hover:border-[#B58D53]/40 hover:bg-[#2A0F0F]/80 transition-all group/card hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#B58D53]/10"
+                          >
+                            <SpeakerAvatar speaker={speaker} size="md" />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-bold text-[#FDF0C4] group-hover/card:text-[#B58D53] transition-colors truncate">
+                                {speaker.name}
+                              </p>
+                              <p className="text-xs text-[#B58D53] mt-0.5">{speaker.role}</p>
+                              <p className="text-xs text-[#FDF0C4]/40 mt-0.5">{speaker.company}</p>
+                              <p className="text-xs text-[#FDF0C4]/30">{speaker.country}</p>
+                            </div>
+                            <ExternalLink className="w-4 h-4 text-[#B58D53]/40 group-hover/card:text-[#B58D53] transition-colors flex-shrink-0" />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* ──── REGULAR SESSION CARD ──── */
+                  <div className="group relative bg-gradient-to-r from-[#3D2317] to-[#3D2317]/80 rounded-xl overflow-hidden border border-[#B58D53]/15 hover:border-[#B58D53]/40 transition-all duration-500 hover:shadow-xl hover:shadow-[#B58D53]/10">
+                    {/* Gold accent bar */}
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#B58D53] to-[#96542E]" />
+
+                    <div className="p-6 md:p-8">
+                      <div className="flex flex-col md:flex-row gap-6">
+                        {/* Speaker photo - LEFT side */}
+                        <div className="flex md:flex-col items-center gap-3 md:min-w-[160px]">
+                          {daySchedule.speakers.map((speaker, si) => (
+                            <SpeakerAvatar key={si} speaker={speaker} size="lg" />
+                          ))}
                         </div>
 
-                        <h3 className="text-xl md:text-2xl font-bold text-[#FDF0C4] mb-2 group-hover:text-[#B58D53] transition-colors">
-                          {daySchedule.title}
-                        </h3>
-                        <p className="text-[#FDF0C4]/60 text-sm mb-4 leading-relaxed">{daySchedule.description}</p>
+                        {/* Content - RIGHT side */}
+                        <div className="flex-1">
+                          <div className="flex flex-wrap items-center gap-3 mb-3">
+                            <span className="inline-flex items-center gap-1.5 bg-[#B58D53] text-[#3D2317] px-4 py-1.5 rounded-full font-bold text-xs uppercase tracking-wider">
+                              <img src="/images/decorations/moon.png" alt="" className="w-3.5 h-3.5" />
+                              Night {daySchedule.day}
+                            </span>
+                            <span className="text-[#B58D53]/80 text-sm">{daySchedule.date}</span>
+                          </div>
 
-                        {/* Speaker info */}
-                        <div className="flex flex-wrap gap-4">
-                          {daySchedule.speakers.map((speaker, si) => (
-                            <a
-                              key={si}
-                              href={speaker.linkedinUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 px-3 py-2 bg-[#2A0F0F]/60 rounded-lg hover:bg-[#B58D53]/10 transition-colors group/link"
-                            >
-                              <div>
-                                <p className="text-sm font-semibold text-[#FDF0C4] group-hover/link:text-[#B58D53] transition-colors">
-                                  {speaker.name}
-                                </p>
-                                <p className="text-xs text-[#FDF0C4]/50">
-                                  {speaker.role} • {speaker.company}
-                                </p>
-                                <p className="text-xs text-[#B58D53]/70">{speaker.country}</p>
-                              </div>
-                              <ExternalLink className="w-4 h-4 text-[#B58D53]/50 group-hover/link:text-[#B58D53] transition-colors flex-shrink-0" />
-                            </a>
-                          ))}
+                          <h3 className="text-xl md:text-2xl font-bold text-[#FDF0C4] mb-2 group-hover:text-[#B58D53] transition-colors">
+                            {daySchedule.title}
+                          </h3>
+                          <p className="text-[#FDF0C4]/60 text-sm mb-4 leading-relaxed">{daySchedule.description}</p>
+
+                          {/* Speaker info */}
+                          <div className="flex flex-wrap gap-4">
+                            {daySchedule.speakers.map((speaker, si) => (
+                              <a
+                                key={si}
+                                href={speaker.linkedinUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-3 py-2 bg-[#2A0F0F]/60 rounded-lg hover:bg-[#B58D53]/10 transition-colors group/link"
+                              >
+                                <div>
+                                  <p className="text-sm font-semibold text-[#FDF0C4] group-hover/link:text-[#B58D53] transition-colors">
+                                    {speaker.name}
+                                  </p>
+                                  <p className="text-xs text-[#FDF0C4]/50">
+                                    {speaker.role} • {speaker.company}
+                                  </p>
+                                  <p className="text-xs text-[#B58D53]/70">{speaker.country}</p>
+                                </div>
+                                <ExternalLink className="w-4 h-4 text-[#B58D53]/50 group-hover/link:text-[#B58D53] transition-colors flex-shrink-0" />
+                              </a>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
               </AnimatedSection>
             ))}
           </div>
@@ -826,7 +911,7 @@ export default function Home() {
         style={{ background: "linear-gradient(135deg, #631616 0%, #3D2317 50%, #2A0F0F 100%)" }}
       >
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "url('/images/ramadan-pattern-bg.png')", backgroundSize: "cover" }} />
-        
+
         {/* Corner decorations */}
         <FloatingDecoration
           src="/images/decorations/lantern.png"
@@ -871,9 +956,9 @@ export default function Home() {
                       placeholder="Your full name"
                       value={formData.name}
                       onChange={(e) => handleFormChange("name", e.target.value)}
-                      className="mt-1.5 bg-[#2A0F0F]/60 border-[#B58D53]/20 text-[#FDF0C4] placeholder:text-[#FDF0C4]/30 focus:border-[#B58D53] focus:ring-[#B58D53]/30"
-                      required
+                      className={`mt-1.5 bg-[#2A0F0F]/60 border-[#B58D53]/20 text-[#FDF0C4] placeholder:text-[#FDF0C4]/30 focus:border-[#B58D53] focus:ring-[#B58D53]/30 ${formErrors.name ? 'border-red-500' : ''}`}
                     />
+                    {formErrors.name && <p className="text-red-400 text-xs mt-1">{formErrors.name}</p>}
                   </div>
                   <div>
                     <Label htmlFor="email" className="text-[#FDF0C4] font-semibold text-sm">
@@ -885,9 +970,9 @@ export default function Home() {
                       placeholder="email@example.com"
                       value={formData.email}
                       onChange={(e) => handleFormChange("email", e.target.value)}
-                      className="mt-1.5 bg-[#2A0F0F]/60 border-[#B58D53]/20 text-[#FDF0C4] placeholder:text-[#FDF0C4]/30 focus:border-[#B58D53] focus:ring-[#B58D53]/30"
-                      required
+                      className={`mt-1.5 bg-[#2A0F0F]/60 border-[#B58D53]/20 text-[#FDF0C4] placeholder:text-[#FDF0C4]/30 focus:border-[#B58D53] focus:ring-[#B58D53]/30 ${formErrors.email ? 'border-red-500' : ''}`}
                     />
+                    {formErrors.email && <p className="text-red-400 text-xs mt-1">{formErrors.email}</p>}
                   </div>
                 </div>
 
@@ -902,9 +987,9 @@ export default function Home() {
                       placeholder="+20 XXX XXX XXXX"
                       value={formData.phone}
                       onChange={(e) => handleFormChange("phone", e.target.value)}
-                      className="mt-1.5 bg-[#2A0F0F]/60 border-[#B58D53]/20 text-[#FDF0C4] placeholder:text-[#FDF0C4]/30 focus:border-[#B58D53] focus:ring-[#B58D53]/30"
-                      required
+                      className={`mt-1.5 bg-[#2A0F0F]/60 border-[#B58D53]/20 text-[#FDF0C4] placeholder:text-[#FDF0C4]/30 focus:border-[#B58D53] focus:ring-[#B58D53]/30 ${formErrors.phone ? 'border-red-500' : ''}`}
                     />
+                    {formErrors.phone && <p className="text-red-400 text-xs mt-1">{formErrors.phone}</p>}
                   </div>
                   <div>
                     <Label htmlFor="university" className="text-[#FDF0C4] font-semibold text-sm">
@@ -915,9 +1000,9 @@ export default function Home() {
                       placeholder="Your university or org"
                       value={formData.university}
                       onChange={(e) => handleFormChange("university", e.target.value)}
-                      className="mt-1.5 bg-[#2A0F0F]/60 border-[#B58D53]/20 text-[#FDF0C4] placeholder:text-[#FDF0C4]/30 focus:border-[#B58D53] focus:ring-[#B58D53]/30"
-                      required
+                      className={`mt-1.5 bg-[#2A0F0F]/60 border-[#B58D53]/20 text-[#FDF0C4] placeholder:text-[#FDF0C4]/30 focus:border-[#B58D53] focus:ring-[#B58D53]/30 ${formErrors.university ? 'border-red-500' : ''}`}
                     />
+                    {formErrors.university && <p className="text-red-400 text-xs mt-1">{formErrors.university}</p>}
                   </div>
                 </div>
 
@@ -930,9 +1015,9 @@ export default function Home() {
                     placeholder="e.g., Student, Software Engineer, Data Scientist"
                     value={formData.position}
                     onChange={(e) => handleFormChange("position", e.target.value)}
-                    className="mt-1.5 bg-[#2A0F0F]/60 border-[#B58D53]/20 text-[#FDF0C4] placeholder:text-[#FDF0C4]/30 focus:border-[#B58D53] focus:ring-[#B58D53]/30"
-                    required
+                    className={`mt-1.5 bg-[#2A0F0F]/60 border-[#B58D53]/20 text-[#FDF0C4] placeholder:text-[#FDF0C4]/30 focus:border-[#B58D53] focus:ring-[#B58D53]/30 ${formErrors.position ? 'border-red-500' : ''}`}
                   />
+                  {formErrors.position && <p className="text-red-400 text-xs mt-1">{formErrors.position}</p>}
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-5">
@@ -962,10 +1047,33 @@ export default function Home() {
                       placeholder="https://..."
                       value={formData.resumeUrl}
                       onChange={(e) => handleFormChange("resumeUrl", e.target.value)}
-                      className="mt-1.5 bg-[#2A0F0F]/60 border-[#B58D53]/20 text-[#FDF0C4] placeholder:text-[#FDF0C4]/30 focus:border-[#B58D53] focus:ring-[#B58D53]/30"
+                      className={`mt-1.5 bg-[#2A0F0F]/60 border-[#B58D53]/20 text-[#FDF0C4] placeholder:text-[#FDF0C4]/30 focus:border-[#B58D53] focus:ring-[#B58D53]/30 ${formErrors.resumeUrl ? 'border-red-500' : ''}`}
                     />
+                    {formErrors.resumeUrl && <p className="text-red-400 text-xs mt-1">{formErrors.resumeUrl}</p>}
                   </div>
                 </div>
+
+                {/* IEEE Membership ID - conditional */}
+                {formData.ieeeStatus && formData.ieeeStatus !== "not-member" && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Label htmlFor="ieeeMembershipId" className="text-[#FDF0C4] font-semibold text-sm">
+                      IEEE Membership ID <span className="text-[#B58D53]">*</span>
+                    </Label>
+                    <Input
+                      id="ieeeMembershipId"
+                      placeholder="Enter your IEEE membership ID"
+                      value={formData.ieeeMembershipId}
+                      onChange={(e) => handleFormChange("ieeeMembershipId", e.target.value)}
+                      className={`mt-1.5 bg-[#2A0F0F]/60 border-[#B58D53]/20 text-[#FDF0C4] placeholder:text-[#FDF0C4]/30 focus:border-[#B58D53] focus:ring-[#B58D53]/30 ${formErrors.ieeeMembershipId ? 'border-red-500' : ''}`}
+                    />
+                    {formErrors.ieeeMembershipId && <p className="text-red-400 text-xs mt-1">{formErrors.ieeeMembershipId}</p>}
+                  </motion.div>
+                )}
 
                 <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
                   <Button
@@ -1036,7 +1144,7 @@ export default function Home() {
               <Card className="p-8 bg-[#3D2317]/60 border border-[#B58D53]/15 hover:border-[#B58D53]/40 transition-all group backdrop-blur-sm">
                 <div className="flex flex-col items-center text-center">
                   <img
-                    src="/images/brand/ieee-eui-cs.jpeg"
+                    src="/images/brand/ieee-cs-eui.png"
                     alt="IEEE Computer Society"
                     className="h-20 object-contain mb-4 rounded group-hover:scale-105 transition-transform"
                   />
@@ -1068,7 +1176,7 @@ export default function Home() {
       <footer className="relative overflow-hidden" style={{ background: "linear-gradient(180deg, #1a0808 0%, #0d0404 100%)" }}>
         {/* Decorative top border */}
         <div className="h-1 bg-gradient-to-r from-transparent via-[#B58D53] to-transparent" />
-        
+
         {/* Decorative bunting */}
         <div className="flex justify-center -mt-1">
           <img src="/images/decorations/decorations.png" alt="" className="w-40 opacity-40" />
@@ -1078,14 +1186,14 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8 mb-10">
             <div className="md:col-span-2">
               <div className="flex items-center gap-3 mb-4">
-                <img src="/images/brand/qataiyef-logo.jpeg" alt="QatAIyef" className="h-12 w-12 rounded-lg ring-2 ring-[#B58D53]/40" />
+                <img src="/images/brand/qataiyef-logo-circle.png" alt="QatAIyef" className="h-12 w-12 rounded-full ring-2 ring-[#B58D53]/40" />
                 <div>
                   <h3 className="text-xl font-bold text-[#FDF0C4]">QatAIyef</h3>
                   <p className="text-xs text-[#B58D53] uppercase tracking-widest">AI Engineering Nights</p>
                 </div>
               </div>
               <p className="text-[#FDF0C4]/60 text-sm leading-relaxed max-w-sm">
-                A comprehensive 7-day online technical event organized by IEEE EUI Computer Society, 
+                A comprehensive 7-day online technical event organized by IEEE EUI Computer Society,
                 guiding you through the full AI engineering journey.
               </p>
             </div>
@@ -1135,7 +1243,7 @@ export default function Home() {
             </p>
             <div className="flex items-center gap-4">
               <img src="/images/brand/ieee-logo.jpg" alt="IEEE" className="h-7 object-contain rounded opacity-60 hover:opacity-100 transition-opacity" />
-              <img src="/images/brand/ieee-eui-cs.jpeg" alt="IEEE CS" className="h-7 object-contain rounded opacity-60 hover:opacity-100 transition-opacity" />
+              <img src="/images/brand/ieee-cs-eui.png" alt="IEEE CS" className="h-7 object-contain rounded opacity-60 hover:opacity-100 transition-opacity" />
             </div>
             <p className="text-xs text-[#FDF0C4]/40">
               Organized by IEEE EUI Computer Society Student Branch
