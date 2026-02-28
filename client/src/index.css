@@ -3,8 +3,8 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* QatAIyef Brand Typography */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Lora:wght@400;500;600&display=swap');
+/* QatAIyef Brand Typography - Ramadan Heritage Modern */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Lora:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap');
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -46,81 +46,47 @@
 }
 
 :root {
-  /* QatAIyef Brand Colors */
+  /* QatAIyef Brand Colors - Ramadan Heritage */
   --maroon: #631616;
   --gold: #B58D53;
   --cream: #FDF0C4;
   --dark-brown: #3D2317;
   --burnt-orange: #96542E;
-  
-  --primary: #631616;
-  --primary-foreground: #FDF0C4;
-  --sidebar-primary: #631616;
-  --sidebar-primary-foreground: #FDF0C4;
+  --deep-dark: #2A0F0F;
+
+  --primary: #B58D53;
+  --primary-foreground: #3D2317;
+  --sidebar-primary: #B58D53;
+  --sidebar-primary-foreground: #3D2317;
   --chart-1: #B58D53;
   --chart-2: #96542E;
   --chart-3: #631616;
   --chart-4: #3D2317;
   --chart-5: #8B5A3C;
   --radius: 0.65rem;
-  --background: #FDF0C4;
-  --foreground: #3D2317;
-  --card: #FFFFFF;
-  --card-foreground: #3D2317;
-  --popover: #FFFFFF;
-  --popover-foreground: #3D2317;
-  --secondary: #B58D53;
-  --secondary-foreground: #FFFFFF;
-  --muted: #E8DCC8;
-  --muted-foreground: #8B7355;
-  --accent: #631616;
-  --accent-foreground: #FDF0C4;
+  --background: #2A0F0F;
+  --foreground: #FDF0C4;
+  --card: #3D2317;
+  --card-foreground: #FDF0C4;
+  --popover: #3D2317;
+  --popover-foreground: #FDF0C4;
+  --secondary: #631616;
+  --secondary-foreground: #FDF0C4;
+  --muted: #3D2317;
+  --muted-foreground: #B58D53;
+  --accent: #B58D53;
+  --accent-foreground: #3D2317;
   --destructive: #DC2626;
   --destructive-foreground: #FDF0C4;
-  --border: #E8DCC8;
-  --input: #FFFFFF;
+  --border: rgba(181, 141, 83, 0.2);
+  --input: #2A0F0F;
   --ring: #B58D53;
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #3D2317;
-  --sidebar-accent: #631616;
-  --sidebar-accent-foreground: #FDF0C4;
-  --sidebar-border: #E8DCC8;
+  --sidebar: #3D2317;
+  --sidebar-foreground: #FDF0C4;
+  --sidebar-accent: #B58D53;
+  --sidebar-accent-foreground: #3D2317;
+  --sidebar-border: rgba(181, 141, 83, 0.2);
   --sidebar-ring: #B58D53;
-}
-
-.dark {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-500);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.85 0.005 65);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.85 0.005 65);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.85 0.005 65);
-  --secondary: oklch(0.24 0.006 286.033);
-  --secondary-foreground: oklch(0.7 0.005 65);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground:  oklch(0.92 0.005 65);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.488 0.243 264.376);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.85 0.005 65);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground:  oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.488 0.243 264.376);
 }
 
 @layer base {
@@ -150,24 +116,11 @@
 }
 
 @layer components {
-  /**
-   * Custom container utility that centers content and adds responsive padding.
-   *
-   * This overrides Tailwind's default container behavior to:
-   * - Auto-center content (mx-auto)
-   * - Add responsive horizontal padding
-   * - Set max-width for large screens
-   *
-   * Usage: <div className="container">...</div>
-   *
-   * For custom widths, use max-w-* utilities directly:
-   * <div className="max-w-6xl mx-auto px-4">...</div>
-   */
   .container {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    padding-left: 1rem; /* 16px - mobile padding */
+    padding-left: 1rem;
     padding-right: 1rem;
   }
 
@@ -178,24 +131,25 @@
 
   @media (min-width: 640px) {
     .container {
-      padding-left: 1.5rem; /* 24px - tablet padding */
+      padding-left: 1.5rem;
       padding-right: 1.5rem;
     }
   }
 
   @media (min-width: 1024px) {
     .container {
-      padding-left: 2rem; /* 32px - desktop padding */
+      padding-left: 2rem;
       padding-right: 2rem;
-      max-width: 1280px; /* Standard content width */
+      max-width: 1280px;
     }
   }
 }
-/* QatAIyef Custom Animations */
+
+/* ═══════════ Custom Animations ═══════════ */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -203,105 +157,81 @@
   }
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(181, 141, 83, 0.15); }
+  50% { box-shadow: 0 0 40px rgba(181, 141, 83, 0.3); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-10px) rotate(2deg); }
+  50% { transform: translateY(-5px) rotate(-1deg); }
+  75% { transform: translateY(-15px) rotate(1deg); }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.8s ease-out forwards;
   opacity: 0;
 }
 
-/* QatAIyef Color Utilities */
-.text-maroon {
-  color: #631616;
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    #B58D53 0%,
+    #FDF0C4 50%,
+    #B58D53 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.text-gold {
-  color: #B58D53;
+.animate-glow-pulse {
+  animation: glowPulse 3s ease-in-out infinite;
 }
 
-.text-dark-brown {
-  color: #3D2317;
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
-.text-burnt-orange {
-  color: #96542E;
+/* ═══════════ Scrollbar Styling ═══════════ */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #2A0F0F;
+}
+::-webkit-scrollbar-thumb {
+  background: #B58D53;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #96542E;
 }
 
-.bg-maroon {
-  background-color: #631616;
+/* ═══════════ Selection Color ═══════════ */
+::selection {
+  background: rgba(181, 141, 83, 0.3);
+  color: #FDF0C4;
 }
 
-.bg-gold {
-  background-color: #B58D53;
+/* ═══════════ Smooth Scrolling ═══════════ */
+html {
+  scroll-behavior: smooth;
 }
 
-.bg-cream {
-  background-color: #FDF0C4;
-}
-
-.bg-dark-brown {
-  background-color: #3D2317;
-}
-
-.border-gold {
-  border-color: #B58D53;
-}
-
-.border-gold\/20 {
-  border-color: rgba(181, 141, 83, 0.2);
-}
-
-.border-gold\/30 {
-  border-color: rgba(181, 141, 83, 0.3);
-}
-
-/* Hover States */
-.hover\:text-gold:hover {
-  color: #B58D53;
-}
-
-.hover\:text-maroon:hover {
-  color: #631616;
-}
-
-.hover\:bg-maroon\/5:hover {
-  background-color: rgba(99, 22, 22, 0.05);
-}
-
-.hover\:bg-gold\/10:hover {
-  background-color: rgba(181, 141, 83, 0.1);
-}
-
-.hover\:bg-maroon\/90:hover {
-  background-color: rgba(99, 22, 22, 0.9);
-}
-
-/* Focus States */
-.focus\:border-gold:focus {
-  border-color: #B58D53;
-}
-
-.focus\:ring-gold:focus {
-  --tw-ring-color: #B58D53;
-}
-
-/* Responsive Typography */
-@media (max-width: 768px) {
-  h1 {
-    font-size: 2rem;
-  }
-  h2 {
-    font-size: 1.75rem;
-  }
-  h3 {
-    font-size: 1.5rem;
-  }
-}
-
-/* Smooth Transitions */
+/* ═══════════ Smooth Transitions ═══════════ */
 button, a, input, select, textarea {
   transition: all 0.3s ease;
 }
 
-/* Typography Enhancements */
+/* ═══════════ Typography Color for Dark Theme ═══════════ */
 h1, h2, h3, h4, h5, h6 {
-  color: #631616;
+  color: #FDF0C4;
 }
