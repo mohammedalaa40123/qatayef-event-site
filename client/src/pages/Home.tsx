@@ -25,6 +25,7 @@ interface Speaker {
   country: string;
   linkedinUrl: string;
   imageUrl?: string;
+  isPending?: boolean;
 }
 
 interface DaySchedule {
@@ -62,12 +63,12 @@ const schedule: DaySchedule[] = [
       "Master Retrieval-Augmented Generation with practical methodologies for integrating LLMs with private datasets and building scalable retrieval pipelines.",
     speakers: [
       {
-        name: "Abdelrahman Hafrag",
-        role: "Co-Founder",
-        company: "Almach AI",
-        country: "🇺🇸 United States",
-        linkedinUrl: "https://www.linkedin.com/in/abdulhafrag/",
-        imageUrl: "/images/speakers/abdelrahman-hafrag.jpg",
+        name: "Omer Nacar",
+        role: "Senior AI Researcher & Founder",
+        company: "Namaa Community",
+        country: "🇸🇦 Saudi Arabia",
+        linkedinUrl: "https://www.linkedin.com/in/omarnj/",
+        imageUrl: "/images/speakers/omar-nj.jpg",
       },
     ],
   },
@@ -146,12 +147,13 @@ const schedule: DaySchedule[] = [
         imageUrl: "/images/speakers/omar-samir.jpg",
       },
       {
-        name: "Ayman Saber",
+        name: "Pending",
         role: "GenAI Engineer",
         company: "VOIS",
         country: "🇪🇬 Egypt",
-        linkedinUrl: "https://eg.linkedin.com/in/ayrosa",
+        linkedinUrl: "",
         imageUrl: "/images/speakers/ayman-saber.jpg",
+        isPending: true,
       },
     ],
     isPanel: true,
@@ -178,6 +180,14 @@ const schedule: DaySchedule[] = [
         country: "🇪🇬 Egypt",
         linkedinUrl: "https://be.linkedin.com/in/ahmedabdelhamid",
         imageUrl: "/images/speakers/ahmed-abdelhamid.jpg",
+      },
+      {
+        name: "Mohamed Fatah",
+        role: "Founder & CEO",
+        company: "Bub AI",
+        country: "🇪🇬 Egypt",
+        linkedinUrl: "https://www.linkedin.com/in/mo-fattah-bb1234160",
+        imageUrl: "/images/speakers/mo-fattah.jpg",
       },
     ],
     isPanel: true,
@@ -237,12 +247,12 @@ function SpeakerAvatar({ speaker, size = "md" }: { speaker: Speaker; size?: "sm"
     .slice(0, 2);
 
   return (
-    <div className={`${sizeClasses[size]} rounded-full ring-3 ring-[#B58D53] ring-offset-2 ring-offset-[#631616] overflow-hidden flex-shrink-0`}>
+    <div className={`${sizeClasses[size]} rounded-full ring-3 ring-[#B58D53] ring-offset-2 ring-offset-[#631616] overflow-hidden flex-shrink-0 ${speaker.isPending ? 'opacity-70' : ''}`}>
       {speaker.imageUrl ? (
         <img
           src={speaker.imageUrl}
           alt={speaker.name}
-          className="w-full h-full object-cover"
+          className={`w-full h-full object-cover ${speaker.isPending ? 'blur-sm grayscale' : ''}`}
           onError={(e) => {
             (e.target as HTMLImageElement).style.display = "none";
             (e.target as HTMLImageElement).nextElementSibling?.classList.remove("hidden");
@@ -356,24 +366,37 @@ export default function Home() {
     setIsSubmitting(true);
 
     try {
-      const formBody = new FormData();
-      formBody.append("name", formData.name);
-      formBody.append("email", formData.email);
-      formBody.append("phone", formData.phone);
-      formBody.append("university", formData.university);
-      formBody.append("position", formData.position);
-      formBody.append("ieeeStatus", formData.ieeeStatus || "N/A");
-      formBody.append("ieeeMembershipId", formData.ieeeMembershipId || "N/A");
-      formBody.append("resumeUrl", formData.resumeUrl || "N/A");
+      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxAF7Tb8VRJmrII_8OzdBmv3a49Ver8x5YKvUBmYlq2A5tw5z9QJFnXsK_Z4B3Olec/exec";
 
-      await fetch(
-        "https://script.google.com/macros/s/AKfycbxAF7Tb8VRJmrII_8OzdBmv3a49Ver8x5YKvUBmYlq2A5tw5z9QJFnXsK_Z4B3Olec/exec",
-        {
-          method: "POST",
-          mode: "no-cors",
-          body: formBody,
-        }
-      );
+      const params = new URLSearchParams({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        university: formData.university,
+        position: formData.position,
+        ieeeStatus: formData.ieeeStatus || "N/A",
+        ieeeMembershipId: formData.ieeeMembershipId || "N/A",
+        resumeUrl: formData.resumeUrl || "N/A",
+      });
+
+      // Use fetch GET with no-cors — confirmed doGet endpoint works
+      const url = SCRIPT_URL + "?" + params.toString();
+
+      // Fire multiple methods in parallel for maximum reliability
+      await Promise.race([
+        // Method 1: fetch GET with no-cors
+        fetch(url, { method: "GET", mode: "no-cors" }).catch(() => { }),
+        // Method 2: Script tag (guaranteed to fire GET)
+        new Promise<void>((resolve) => {
+          const script = document.createElement("script");
+          script.src = url;
+          script.onload = () => { script.remove(); resolve(); };
+          script.onerror = () => { script.remove(); resolve(); }; // request still sent
+          document.head.appendChild(script);
+        }),
+        // Timeout fallback
+        new Promise<void>((resolve) => setTimeout(resolve, 5000)),
+      ]);
 
       toast.success("Registration submitted successfully! We'll be in touch soon. 🎉");
       setFormData({
@@ -396,7 +419,21 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#2A0F0F]">
+    <div className="min-h-screen bg-[#2A0F0F] relative overflow-hidden">
+      {/* ═══════════ FLOATING DECORATIVE ICONS ═══════════ */}
+      <div className="fixed inset-0 pointer-events-none z-0" aria-hidden="true">
+        <img src="/images/icons/tech-lantern.png" alt="" className="floating-icon drift1" style={{ top: '8%', left: '3%', width: '70px' }} />
+        <img src="/images/icons/robot-moon.png" alt="" className="floating-icon drift2" style={{ top: '15%', right: '4%', width: '80px' }} />
+        <img src="/images/icons/qatayef-plate.png" alt="" className="floating-icon drift3" style={{ top: '35%', left: '2%', width: '65px' }} />
+        <img src="/images/icons/star-circuit.png" alt="" className="floating-icon drift1" style={{ top: '50%', right: '3%', width: '60px', animationDelay: '3s' }} />
+        <img src="/images/icons/robot-lantern.png" alt="" className="floating-icon drift2" style={{ top: '65%', left: '4%', width: '70px', animationDelay: '5s' }} />
+        <img src="/images/icons/geometric-pattern.png" alt="" className="floating-icon drift3" style={{ top: '80%', right: '5%', width: '75px', animationDelay: '2s' }} />
+        <img src="/images/icons/robot-fez.png" alt="" className="floating-icon drift1" style={{ top: '45%', left: '5%', width: '55px', animationDelay: '7s' }} />
+        <img src="/images/icons/mosque-minaret.png" alt="" className="floating-icon drift2" style={{ top: '25%', right: '6%', width: '50px', animationDelay: '4s' }} />
+        <img src="/images/icons/palm-tree.png" alt="" className="floating-icon drift3" style={{ top: '72%', right: '2%', width: '58px', animationDelay: '6s' }} />
+        <img src="/images/icons/ai-chip-badge.png" alt="" className="floating-icon drift1" style={{ top: '90%', left: '6%', width: '60px', animationDelay: '8s' }} />
+      </div>
+
       {/* ═══════════════════ HEADER ═══════════════════ */}
       <header className="sticky top-0 z-50 bg-[#3D2317]/95 backdrop-blur-md border-b border-[#B58D53]/30 shadow-lg shadow-black/20">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
